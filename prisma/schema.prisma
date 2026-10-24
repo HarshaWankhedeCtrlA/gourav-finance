@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("VIEWER")
+  totpSecret    String?
+  isTotpEnabled Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model EmiSetting {
+  id               String   @id @default(cuid())
+  productType      String   @unique
+  minAmount        Int
+  maxAmount        Int
+  defaultAmount    Int
+  amountStep       Int      @default(10000)
+  minRate          Float
+  maxRate          Float
+  defaultRate      Float
+  rateStep         Float    @default(0.25)
+  minTenureMonths  Int
+  maxTenureMonths  Int
+  defaultTenureMonths Int
+  updatedAt        DateTime @updatedAt
+}
+model Lead {
+  id          String   @id @default(cuid())
+  refNumber   String   @unique
+  name        String
+  mobile      String
+  email       String?
+  loanType    String
+  amount      Int
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+}

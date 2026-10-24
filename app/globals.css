@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0F4C5C;
+  --color-accent: #E8A33D;
+  --color-ink: #1C2321;
+  --color-background: #F7F5F0;
+  --color-card: #FFFFFF;
+  --color-success: #2E7D5B;
+  --color-muted: #6B7280;
+
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: var(--font-fraunces), serif;
+  --font-hindi: var(--font-devanagari), sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    color: var(--color-primary);
+  }
+}
+
+/* Hindi typography override */
+[lang="hi"] body,
+[lang="hi"] h1,
+[lang="hi"] h2,
+[lang="hi"] h3 {
+  font-family: var(--font-hindi);
+}
+
+/* Hide number input arrows for clean calculator UI */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
