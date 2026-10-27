@@ -1,45 +1,73 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Link } from '@/i18n/navigation';
-import { Button } from '@/components/ui/button';
+import type { Metadata } from 'next';
+import { TrendingUp, Wallet, Layers } from 'lucide-react';
+import LoanPage, { type LoanPageData } from '@/components/loan-page';
+
+export const metadata: Metadata = {
+  title: 'Business Loan Against Property in Rohtak | Gourav Finance',
+  description:
+    'Secured business loans (loan against property) for MSMEs in Rohtak and Haryana from Gourav Finance, an RBI-registered NBFC. Clear terms and a Key Fact Statement before you sign.',
+};
+
+/* TODO: amounts, tenure and rate come from your existing page. Move to the admin product list. */
+const data: LoanPageData = {
+  product: 'business',
+  title: 'Business Loans',
+  intro:
+    'Loan Against Property (LAP) designed to help MSMEs expand, manage working capital, or consolidate debt.',
+  facts: [
+    { label: 'Loan amount', value: '₹5 Lakh – ₹50 Lakh' },
+    { label: 'Tenure', value: 'Up to 10 years' },
+    { label: 'Rate from', value: '12% p.a.*' },
+    { label: 'Security', value: 'Residential or commercial property' },
+  ],
+  uses: [
+    { icon: TrendingUp, title: 'Expand your business', text: 'Fund growth, new premises, machinery or stock.' },
+    { icon: Wallet, title: 'Working capital', text: 'Manage day-to-day business cash flow.' },
+    { icon: Layers, title: 'Consolidate debt', text: 'Bring existing business loans together.' },
+  ],
+  // TODO: confirm these criteria against your credit policy.
+  eligibility: [
+    'Indian resident aged 21 to 65 years at loan maturity',
+    'Owner of a residential or commercial property with a clear title',
+    'Running a business, or earning a regular income that can service the EMI',
+    'Satisfactory credit history',
+    'Property located in our service area',
+  ],
+  documents: [
+    { title: 'KYC documents', items: ['Aadhaar and PAN card', 'Photographs'] },
+    { title: 'Property documents', items: ['Title deed', 'Chain of documents'] },
+    { title: 'Income documents', items: ['ITR of the last 2 years', 'Bank statements of the last 6 months'] },
+    { title: 'If you are self-employed', items: ['Business proof (GST / Udyam / shop licence)', 'ITR with computation of income'] },
+  ],
+  // FAQ answers only restate points from the website brief. Have compliance review before publishing.
+  faqs: [
+    {
+      q: 'Will I see the full cost before I sign?',
+      a: 'Yes. You receive a Key Fact Statement showing the rate, EMI and charges before you sign.',
+    },
+    {
+      q: 'Is approval guaranteed?',
+      a: 'No. Every application goes through credit assessment, and the final rate, EMI and charges depend on that assessment as per our Interest Rate Policy.',
+    },
+    {
+      q: 'Does Gourav Finance accept public deposits?',
+      a: 'No. Gourav Finance is a non-deposit-taking NBFC registered with the Reserve Bank of India.',
+    },
+    {
+      q: 'When do I get my property documents back after closing the loan?',
+      a: 'Original property documents are returned within 30 days of loan closure.',
+    },
+    {
+      q: 'Are the EMI calculator figures final?',
+      a: 'No. They are indicative only. Your actual figures are shown in your Key Fact Statement before you sign.',
+    },
+    {
+      q: 'How do I make a complaint?',
+      a: 'Start with customer care, then our Grievance Redressal Officer. If it is unresolved within 30 days, you can approach the RBI Integrated Ombudsman. See our Grievance Redressal page for details.',
+    },
+  ],
+};
 
 export default function BusinessLoanPage() {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">
-        <section className="bg-primary text-white py-16 px-4">
-          <div className="container mx-auto max-w-5xl">
-            <h1 className="text-4xl md:text-5xl font-serif mb-4">Business Loans</h1>
-            <p className="text-lg text-primary-foreground/80 max-w-2xl">
-              Loan Against Property (LAP) designed to help MSMEs expand, manage working capital, or consolidate debt.
-            </p>
-          </div>
-        </section>
-        
-        <section className="py-16 container mx-auto px-4 max-w-5xl grid md:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-2xl font-serif text-primary mb-4">Key Features</h2>
-            <ul className="space-y-3 text-gray-600">
-              <li>✅ Loan amounts from ₹5 Lakhs to ₹50 Lakhs</li>
-              <li>✅ Competitive interest rates starting from 12% p.a.</li>
-              <li>✅ Flexible tenure up to 10 years</li>
-              <li>✅ Secured against residential or commercial property</li>
-              <li>✅ Doorstep service in Rohtak and surrounding areas</li>
-            </ul>
-          </div>
-          <div>
-            <h2 className="text-2xl font-serif text-primary mb-4">Eligibility & Documents</h2>
-            <p className="text-sm text-gray-500 mb-2">KYC Documents: Aadhaar, PAN, Photographs</p>
-            <p className="text-sm text-gray-500 mb-2">Property Documents: Title deed, chain of documents</p>
-            <p className="text-sm text-gray-500 mb-6">Income Documents: ITR of last 2 years, bank statements of last 6 months</p>
-            <Link href="/contact">
-              <Button className="bg-primary hover:bg-primary/90 w-full">Apply Now</Button>
-            </Link>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
+  return <LoanPage data={data} />;
 }
