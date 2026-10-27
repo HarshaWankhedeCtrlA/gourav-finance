@@ -20,6 +20,7 @@ model User {
 model EmiSetting {
   id               String   @id @default(cuid())
   productType      String   @unique
+  enabled          Boolean  @default(true)
   minAmount        Int
   maxAmount        Int
   defaultAmount    Int
@@ -31,6 +32,12 @@ model EmiSetting {
   minTenureMonths  Int
   maxTenureMonths  Int
   defaultTenureMonths Int
+  showAmortisation Boolean  @default(true)
+  showPdf          Boolean  @default(true)
+  showDonut        Boolean  @default(true)
+  heading          String   @default("Plan your monthly payment")
+  ctaLabel         String   @default("Apply for this loan")
+  disclaimer       String   @default("Indicative figures only. The actual rate, EMI and charges depend on credit assessment as per our Interest Rate Policy and will be shown in your Key Fact Statement before you sign.")
   updatedAt        DateTime @updatedAt
 }
 model Lead {
@@ -42,5 +49,67 @@ model Lead {
   loanType    String
   amount      Int
   status      String   @default("NEW")
+  notes       String?
+  assignedTo  String?
   createdAt   DateTime @default(now())
+}
+model Grievance {
+  id          String   @id @default(cuid())
+  ticketId    String   @unique
+  name        String
+  mobile      String
+  email       String?
+  category    String
+  description String
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+}
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  minAmount   Int
+  maxAmount   Int
+  minTenure   Int
+  maxTenure   Int
+  interestRate Float
+  createdAt   DateTime @default(now())
+}
+model Branch {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  phone     String
+  email     String?
+  mapLink   String?
+  createdAt DateTime @default(now())
+}
+model Policy {
+  id        String   @id @default(cuid())
+  title     String
+  pdfUrl    String
+  updatedAt DateTime @updatedAt
+}
+model Career {
+  id          String   @id @default(cuid())
+  title       String
+  location    String
+  type        String   @default("Full Time")
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+model SiteSetting {
+  id                    String   @id @default("global")
+  grievanceOfficerName  String   @default("Mr. Rajesh Kumar")
+  grievanceOfficerEmail String   @default("gro@gouravfinance.com")
+  grievanceOfficerPhone String   @default("+91 98765 43210")
+  updatedAt             DateTime @updatedAt
 }

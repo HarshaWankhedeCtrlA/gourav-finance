@@ -1,17 +1,22 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Link } from '@/i18n/navigation';
 
 export default function DisclosuresPage() {
-  const docs = [
-    { title: "Fair Practices Code", date: "01 Apr 2026" },
-    { title: "Interest Rate Policy", date: "01 Apr 2026" },
-    { title: "Schedule of Charges", date: "01 Apr 2026" },
-    { title: "Sample Key Fact Statement (KFS)", date: "01 Apr 2026" },
-    { title: "Most Important Terms & Conditions (MITC)", date: "01 Apr 2026" },
-    { title: "KYC & AML Policy", date: "01 Apr 2026" },
-    { title: "Recovery Code of Conduct", date: "01 Apr 2026" },
-  ];
+  const [policies, setPolicies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/policies")
+      .then((res) => res.json())
+      .then((data) => {
+        setPolicies(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -30,15 +35,36 @@ export default function DisclosuresPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {docs.map((doc, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-ink">{doc.title}</td>
-                  <td className="px-6 py-4 text-gray-500">{doc.date}</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="text-primary text-xs font-semibold cursor-pointer hover:underline">View PDF (EN/HI)</span>
+              {loading ? (
+                <tr>
+                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">Loading documents...</td>
+                </tr>
+              ) : policies.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                    No documents uploaded yet. Please check back later.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                policies.map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-ink">{p.title}</td>
+                    <td className="px-6 py-4 text-gray-500">
+                      {new Date(p.updatedAt).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <a 
+                        href={p.pdfUrl} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-primary text-xs font-semibold hover:underline"
+                      >
+                        View PDF (EN/HI)
+                      </a>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

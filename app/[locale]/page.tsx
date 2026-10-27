@@ -6,40 +6,11 @@ import { Button } from '@/components/ui/button';
 import {
   ArrowRight, Banknote, Building2, CalendarClock, CheckCircle2, ChevronDown, ClipboardCheck,
   FileSignature, FileText, Home as HomeIcon, KeyRound, Landmark, Lock, MapPin, ShieldCheck,
-  Store, UserCheck, Users, Wallet, Briefcase, Search,
+  Store, UserCheck, Users, Wallet, Briefcase, Search, Coins
 } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
 
-/* ------------------------------------------------------------------ *
- * TODO (admin panel): replace these constants with data from your API.
- * - PRODUCTS  -> admin product list
- * - CUSTOMERS_SERVED -> admin "site settings"
- * ------------------------------------------------------------------ */
 const CUSTOMERS_SERVED = '10000+';
-
-const PRODUCTS = [
-  {
-    slug: 'business',
-    icon: Store,
-    name: 'Business Loan',
-    tag: 'Loan against property',
-    blurb: 'Working capital, expansion or debt consolidation for MSMEs, secured against your property.',
-    amount: '₹5 Lakh – ₹50 Lakh',
-    tenure: 'Up to 10 years',
-    rate: 'From 12% p.a.*',
-    pills: ['Residential or commercial property', 'Flexible tenure', 'Local team support'],
-  },
-  {
-    slug: 'housing',
-    icon: HomeIcon,
-    name: 'Housing Loan',
-    tag: 'Buy, build or renovate',
-    blurb: 'Home financing to purchase, construct or improve your home, with clear and transparent charges.',
-    amount: 'Up to ₹1 Crore',
-    tenure: 'Up to 20 years',
-    rate: 'Rate shown in your KFS*',
-    pills: ['Long repayment tenure', 'KFS before you sign', 'Doorstep documentation'],
-  },
-];
 
 const STEPS = [
   { icon: FileSignature, title: 'Apply', text: 'Share your details online or at our office. Our team calls you back.' },
@@ -78,7 +49,19 @@ const AUDIENCES = [
   { icon: Briefcase, title: 'Job seekers', text: 'Join a local team that values trust and service.', href: '/careers', cta: 'View careers' },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // Fetch dynamic products from the database
+  const products = await prisma.product.findMany({
+    orderBy: { createdAt: 'asc' },
+  });
+
+  // Fallback icon if no product icon is set
+  const getProductIcon = (slug: string) => {
+    if (slug.includes('business')) return Store;
+    if (slug.includes('housing') || slug.includes('home')) return HomeIcon;
+    return Coins; // Default icon for others like Gold Loan
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F5F0] text-[#1C2321]">
       <Header />
@@ -119,9 +102,7 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* Photo placeholder + stat card */}
             <div className="relative">
-              {/* TODO: replace with <Image src="/images/hero.jpg" alt="Shop owner discussing a loan with a Gourav Finance executive" ... /> */}
               <div
                 role="img"
                 aria-label="Placeholder: North Indian shop owner meeting a Gourav Finance executive"
@@ -140,38 +121,50 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 2. PRODUCTS */}
+        {/* 2. DYNAMIC PRODUCTS */}
         <section className="bg-white py-16 lg:py-20">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6">
-            <SectionHead eyebrow="Our Loans" title="Loans built around your property and your plans" sub="Two products, explained plainly. Rates and charges are confirmed in your Key Fact Statement." />
-            <div className="mt-12 grid gap-8 md:grid-cols-2">
-              {PRODUCTS.map((p) => (
-                <article key={p.slug} className="group flex flex-col rounded-2xl border border-gray-200 bg-[#F7F5F0] p-8 transition hover:-translate-y-1 hover:shadow-xl">
-                  <div className="flex items-center gap-4">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F4C5C] text-[#E8A33D]">
-                      <p.icon size={28} />
-                    </span>
-                    <div>
-                      <h3 className="font-serif text-2xl font-bold text-[#0F4C5C]">{p.name}</h3>
-                      <p className="text-sm text-[#6B7280]">{p.tag}</p>
-                    </div>
-                  </div>
-                  <p className="mt-5 leading-relaxed text-[#1C2321]/80">{p.blurb}</p>
-                  <dl className="mt-6 grid grid-cols-3 gap-3 rounded-xl bg-white p-4 text-center">
-                    <div><dt className="text-xs text-[#6B7280]">Amount</dt><dd className="mt-1 text-sm font-bold text-[#0F4C5C] tabular-nums">{p.amount}</dd></div>
-                    <div><dt className="text-xs text-[#6B7280]">Tenure</dt><dd className="mt-1 text-sm font-bold text-[#0F4C5C]">{p.tenure}</dd></div>
-                    <div><dt className="text-xs text-[#6B7280]">Rate</dt><dd className="mt-1 text-sm font-bold text-[#0F4C5C]">{p.rate}</dd></div>
-                  </dl>
-                  <ul className="mt-5 flex flex-wrap gap-2">
-                    {p.pills.map((x) => (
-                      <li key={x} className="rounded-full border border-[#0F4C5C]/20 bg-white px-3 py-1 text-xs font-medium text-[#0F4C5C]">{x}</li>
-                    ))}
-                  </ul>
-                  <Link href={`/loans/${p.slug}`} className="mt-7 inline-flex items-center gap-2 font-bold text-[#0F4C5C] group-hover:text-[#E8A33D]">
-                    Know more <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </article>
-              ))}
+            <SectionHead eyebrow="Our Loans" title="Loans built around your needs" sub="Products explained plainly. Rates and charges are confirmed in your Key Fact Statement." />
+            <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {products.length === 0 ? (
+                <p className="col-span-3 text-center text-gray-500">No products available right now.</p>
+              ) : (
+                products.map((p) => {
+                  const Icon = getProductIcon(p.slug);
+                  return (
+                    <article key={p.id} className="group flex flex-col rounded-2xl border border-gray-200 bg-[#F7F5F0] p-8 transition hover:-translate-y-1 hover:shadow-xl">
+                      <div className="flex items-center gap-4">
+                        <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0F4C5C] text-[#E8A33D]">
+                          <Icon size={28} />
+                        </span>
+                        <div>
+                          <h3 className="font-serif text-2xl font-bold text-[#0F4C5C]">{p.name}</h3>
+                        </div>
+                      </div>
+                      <p className="mt-5 leading-relaxed text-[#1C2321]/80 flex-grow">{p.description}</p>
+                      
+                      <dl className="mt-6 grid grid-cols-3 gap-3 rounded-xl bg-white p-4 text-center">
+                        <div>
+                          <dt className="text-xs text-[#6B7280]">Amount</dt>
+                          <dd className="mt-1 text-sm font-bold text-[#0F4C5C] tabular-nums">Up to ₹{(p.maxAmount / 100000).toFixed(0)}L</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-[#6B7280]">Tenure</dt>
+                          <dd className="mt-1 text-sm font-bold text-[#0F4C5C]">Up to {Math.floor(p.maxTenure / 12)} yrs</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-[#6B7280]">Rate</dt>
+                          <dd className="mt-1 text-sm font-bold text-[#0F4C5C]">{p.interestRate}%*</dd>
+                        </div>
+                      </dl>
+                      
+                      <Link href={`/loans/${p.slug}`} className="mt-7 inline-flex items-center gap-2 font-bold text-[#0F4C5C] group-hover:text-[#E8A33D]">
+                        Know more <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </article>
+                  );
+                })
+              )}
             </div>
             <p className="mt-6 text-center text-xs text-[#6B7280]">*Indicative. Actual rate depends on credit assessment as per our Interest Rate Policy.</p>
           </div>
@@ -256,11 +249,9 @@ export default function Home() {
         <section className="py-16 lg:py-20">
           <div className="container mx-auto max-w-5xl px-4 sm:px-6">
             <div className="grid items-center gap-8 rounded-3xl bg-white p-8 shadow-sm border border-gray-100 md:grid-cols-[200px_1fr] md:p-12">
-              {/* TODO: replace with promoter photo */}
               <div role="img" aria-label="Placeholder: photo of Mr Vikas Nandal" className="mx-auto flex h-40 w-40 items-center justify-center rounded-full bg-gradient-to-br from-[#0F4C5C] to-[#0B3641] font-serif text-5xl font-bold text-[#E8A33D] md:h-48 md:w-48">VN</div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#E8A33D]">Promoter&apos;s message</p>
-                {/* TODO: replace with text approved by Mr Vikas Nandal */}
                 <blockquote className="mt-3 font-serif text-xl leading-relaxed text-[#0F4C5C] md:text-2xl">
                   &ldquo;Our work is built on one simple promise: tell the customer everything clearly, before they sign. That is how we have earned trust since 1996.&rdquo;
                 </blockquote>
@@ -276,7 +267,6 @@ export default function Home() {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6">
             <SectionHead eyebrow="Customer stories" title="In their words" sub="Shown only with the customer's written consent." />
             <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {/* TODO: replace with real, consenting customers from the admin panel */}
               {[1, 2, 3].map((n) => (
                 <figure key={n} className="rounded-2xl border border-dashed border-gray-300 bg-[#F7F5F0] p-6">
                   <Wallet size={24} className="text-[#E8A33D]" />

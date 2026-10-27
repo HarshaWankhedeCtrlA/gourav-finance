@@ -1,1 +1,26 @@
-{}
+{
+  "Navigation": {
+    "home": "Home",
+    "loans": "Loans",
+    "businessLoans": "Business Loans",
+    "housingLoans": "Housing Loans",
+    "emiCalculator": "EMI Calculator",
+    "about": "About",
+    "branches": "Branches",
+    "customerHub": "Customer Hub",
+    "contact": "Contact",
+    "calculateEmi": "Calculate EMI",
+    "applyNow": "Apply Now",
+    "grievance": "Grievance Redressal"
+  },
+  "Home": {
+    "heroEyebrow": "RBI-registered NBFC · Established 1996",
+    "heroTitle": "Trusted finance since 1996.",
+    "heroSubtext": "Secured business and home loans for families and enterprises across Haryana. Clear terms, quick decisions, help at your doorstep.",
+    "customersServed": "customers served",
+    "trustChip1": "RBI-registered",
+    "trustChip2": "Non-deposit taking",
+    "trustChip3": "KFS before you sign",
+    "trustChip4": "Local Rohtak team"
+  }
+}

@@ -1,25 +1,34 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const product = searchParams.get("product");
-
-  if (!product) {
-    return NextResponse.json({ error: "Product query parameter required" }, { status: 400 });
-  }
-
+export async function PUT(request: Request) {
   try {
-    const settings = await prisma.emiSetting.findUnique({
-      where: { productType: product },
+    const body = await request.json();
+    const { 
+      productType, enabled, minAmount, maxAmount, minRate, maxRate,
+      showAmortisation, showPdf, showDonut, heading, ctaLabel, disclaimer
+    } = body;
+
+    const updated = await prisma.emiSetting.update({
+      where: { productType },
+      data: {
+        enabled,
+        minAmount: Number(minAmount),
+        maxAmount: Number(maxAmount),
+        minRate: Number(minRate),
+        maxRate: Number(maxRate),
+        showAmortisation,
+        showPdf,
+        showDonut,
+        heading,
+        ctaLabel,
+        disclaimer,
+      },
     });
 
-    if (!settings) {
-      return NextResponse.json({ error: "Settings not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(settings);
-  } catch (error) {
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ success: true, updated });
+  } catch (error: any) {
+    console.error("EMI Settings Error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
